@@ -82,7 +82,8 @@ class Matrix:
   move empty element
   """
   def move(self, dir):
-    emptIndex = self.getEmpty()
+    matr = Matrix(self.matrix)
+    emptIndex = matr.getEmpty()
     # move empty element up
     if (dir == "up"):
       moveIndex = emptIndex - 4
@@ -105,11 +106,14 @@ class Matrix:
       moveIndex = emptIndex - 1
     else:
       print("direction undefined")
+      return
 
-    temp = self.getElmt(moveIndex)
+    temp = matr.getElmt(moveIndex)
     # switch
-    self.setElmt(temp, emptIndex)
-    self.setElmt("", moveIndex)
+    matr.setElmt(temp, emptIndex)
+    matr.setElmt("", moveIndex)
+
+    return matr
 
 
   def X(self):
@@ -118,5 +122,8 @@ class Matrix:
       return 1
     else:
       return 0
+
+
+
 
 

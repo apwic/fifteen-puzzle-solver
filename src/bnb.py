@@ -1,4 +1,5 @@
 from matrix import *
+from operator import itemgetter
 
 """
 find matrix elmt
@@ -34,3 +35,58 @@ def checkBnB(matrix : Matrix):
     return True
   else:
     return False
+
+# """
+# cost to nodes from root
+# """
+# def costRoot(root, cur):
+#   pass
+
+"""
+cost from nodes to goal
+"""
+def costGoal(cur: Matrix):
+  cost = 0
+  for i in range(1, 16):
+    if (cur.getElmt(i) != i):
+      cost += 1
+
+  return cost
+
+def solve(matr: (Matrix, int), cost = 0):
+  # placeholder for each iteration
+  cost += 1
+  matrIter = ["up", "right", "down", "left"]
+  matrQueue = []
+
+  for i in matrIter:
+    movedMatr = matr[0].move(i)
+    if (movedMatr):
+      temp = (movedMatr, cost + costGoal(movedMatr))
+      matrQueue.append(temp)
+
+  # sort by cost
+  matrQueue.sort(key=itemgetter(1))
+  smallestCost = matrQueue[0]
+
+  print(f"{smallestCost[0]}\nCost: {smallestCost[1]}\n")
+  if (costGoal(smallestCost[0]) == 0):
+    return
+  else:
+    solve(smallestCost, cost)
+
+
+# class Tree:
+
+#   def __init__(self, matrix: Matrix, cost):
+#     self.root = (matrix, cost)
+#     self.up = None
+#     self.right = None
+#     self.down = None
+#     self.left = None
+
+#   def costGoal(self):
+#     for i in range(1, 16):
+#       if (self.root[0].getELmt(i) == i):
+
+  

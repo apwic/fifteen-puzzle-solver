@@ -15,6 +15,14 @@ if __name__ == "__main__":
   # print(matr)
 
   # print(checkBnB(matr))
-  inputMatr = Matrix([[1,3,4,15], [2,5,"",12], [7,6,11,14], [8,9,10,13]])
+  inputMatr = Matrix([[1,2,3,4], [5,6,"",8], [9,10,7,11], [13,14,15,12]])
+  # print(checkBnB(inputMatr))
   print(inputMatr)
-  print(checkBnB(inputMatr))
+
+  solve((inputMatr, 0))
+
+  matr = Matrix()
+  check = checkBnB(matr)
+
+  if (check):
+    solve((matr, 0))
