@@ -1,5 +1,8 @@
 from matrix import *
 from operator import itemgetter
+from typing import Tuple
+import copy
+from heapq import heappush, heappop
 
 """
 find matrix elmt
@@ -53,40 +56,98 @@ def costGoal(cur: Matrix):
 
   return cost
 
-def solve(matr: (Matrix, int), cost = 0):
-  # placeholder for each iteration
-  cost += 1
-  matrIter = ["up", "right", "down", "left"]
-  matrQueue = []
+# def solve(matr: Tuple[Matrix, int], cost = 0):
+#   # placeholder for each iteration
+#   cost += 1
+#   matrIter = ["up", "right", "down", "left"]
+#   matrQueue = []
 
-  for i in matrIter:
-    movedMatr = matr[0].move(i)
-    if (movedMatr):
-      temp = (movedMatr, cost + costGoal(movedMatr))
-      matrQueue.append(temp)
+#   for i in matrIter:
+#     movedMatr = matr[0].move(i)
+#     if (movedMatr):
+#       temp = (movedMatr, cost + costGoal(movedMatr))
+#       matrQueue.append(temp)
 
-  # sort by cost
-  matrQueue.sort(key=itemgetter(1))
-  smallestCost = matrQueue[0]
+#   # sort by cost
+#   matrQueue.sort(key=itemgetter(1))
+#   smallestCost = matrQueue[0]
 
-  print(f"{smallestCost[0]}\nCost: {smallestCost[1]}\n")
-  if (costGoal(smallestCost[0]) == 0):
+#   print(f"{smallestCost[0]}\nCost: {smallestCost[1]}\n")
+#   if (costGoal(smallestCost[0]) == 0):
+#     return
+#   else:
+#     solve(smallestCost, cost)
+
+class PriorityQueue:
+  def __init__(self):
+    self.heap = []
+
+  def push(self, k):
+    heappush(self.heap, k)
+
+  def pop(self):
+    return heappop(self.heap)
+
+  def empty(self):
+    if not self.heap:
+      return True
+    else :
+      return False
+
+class Node:
+
+  def __init__(self, parent, matr, cost, level):
+    self.parent = parent
+    self.matr = matr
+    self.cost = cost
+    self.level = level
+
+  def __lt__(self, nxt):
+    return self.cost < nxt.cost
+
+
+def createNode(matr, dir, level, parent) -> Node:
+  newMatr = matr.move(dir)
+
+  cost = costGoal(newMatr)
+  print(cost)
+  print(newMatr)
+  newNode = Node(parent, newMatr, cost, level)
+
+  return newNode  
+
+def printPath(root):
+  if (root == None):
     return
+
+  printPath(root.parent)
+  print(root.matr)
+
+def solve(initial):
+
+  if (checkBnB(initial)):
+    matrIter = ["up", "right", "down", "left"]
+    pq = PriorityQueue()
+
+    cost = costGoal(initial)
+    root = Node(None, initial, cost, 0)
+
+    pq.push(root)
+
+    while not pq.empty():
+      minimum = pq.pop()
+
+      if minimum.cost == 0:
+        printPath(minimum)
+        return minimum
+
+      for i in matrIter:
+        if (minimum.matr.move(i)):
+          print(i)
+          child = createNode(minimum.matr, i, minimum.level + 1, minimum)
+          pq.push(child)
+
   else:
-    solve(smallestCost, cost)
-
-
-# class Tree:
-
-#   def __init__(self, matrix: Matrix, cost):
-#     self.root = (matrix, cost)
-#     self.up = None
-#     self.right = None
-#     self.down = None
-#     self.left = None
-
-#   def costGoal(self):
-#     for i in range(1, 16):
-#       if (self.root[0].getELmt(i) == i):
+    print("Matrix unsolveable")
 
   

@@ -16,7 +16,10 @@ class Matrix:
 
     for i in range(4):
       for j in range(4):
-        inputMatr[i][j] = matrix[i][j]
+        if (matrix[i][j] == 16):
+          inputMatr[i][j] = "";
+        else:
+          inputMatr[i][j] = matrix[i][j]
 
     return inputMatr
 
@@ -117,11 +120,10 @@ class Matrix:
 
 
   def X(self):
-    emptIndex = self.getEmpty()
-    if ((emptIndex // 4) % 2 == 0 and emptIndex % 2 == 0) or ((emptIndex // 4) % 2 == 1 and emptIndex % 2 == 1):
-      return 1
-    else:
-      return 0
+    emptIndex = self.getEmpty() - 1
+    i = emptIndex // 4
+    j = emptIndex % 4
+    return (i + j) % 2
 
 
 
