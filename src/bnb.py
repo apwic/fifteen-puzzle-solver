@@ -1,8 +1,78 @@
+from xml.dom.minicompat import NodeList
 from matrix import *
-from operator import itemgetter
-from typing import Tuple
-import copy
 from heapq import heappush, heappop
+
+"""
+priority queue for determining the next node to be expanded
+"""
+class PriorityQueue:
+  def __init__(self):
+    self.heap = []
+
+  def push(self, k):
+    heappush(self.heap, k)
+
+  def pop(self):
+    return heappop(self.heap)
+
+  def empty(self):
+    if not self.heap:
+      return True
+    else :
+      return False
+
+"""
+node that can expand when the matrix is moved
+"""
+class Node:
+
+  def __init__(self, parent, matr, cost, level, emptyPos):
+    self.parent = parent
+    self.matr = matr
+    self.cost = cost
+    self.level = level
+    self.emptyPos = emptyPos
+
+  def __lt__(self, nxt):
+    return self.cost + self.level < nxt.cost + nxt.level
+
+"""
+create node
+"""
+def createNode(parent, matr, dir, emptyPos, level) -> Node:
+
+  newMatr = matr.move(dir, emptyPos)
+
+  if (dir == "up"):
+    newEmptyPos = emptyPos - 4
+  elif (dir == "down"):
+    newEmptyPos = emptyPos + 4
+  elif (dir == "right"):
+    newEmptyPos = emptyPos + 1
+  else:
+    newEmptyPos = emptyPos - 1
+  
+  # if (newMatr.getElmt(emptyPos) == emptyPos):
+  #   cost = parent.cost - 1
+  # else:
+  #   cost = parent.cost
+  # print(f"Cost : {cost}")
+  # print(newMatr)
+
+  cost = costGoal(newMatr)
+  newNode = Node(parent, newMatr, cost, level, newEmptyPos)
+
+  return newNode  
+
+"""
+print steps to goal
+"""
+def printPath(root):
+  if (root == None):
+    return
+
+  printPath(root.parent)
+  print(root.matr)
 
 """
 find matrix elmt
@@ -26,24 +96,21 @@ def kurang(matrix : Matrix, i):
 check if matrix is solveable
 """
 def checkBnB(matrix : Matrix):
-  kur = 0
+  if (matrix.isValid()):
+    kur = 0
 
-  for i in range(1, 17):
-    kur += kurang(matrix, i)
+    for i in range(1, 17):
+      kur += kurang(matrix, i)
 
-  check = kur + matrix.X()
-  print(f"{check} = {kur} + {matrix.X()}")
+    check = kur + matrix.X()
+    print(f"{check} = {kur} + {matrix.X()}")
 
-  if (check % 2 == 0):
-    return True
+    if (check % 2 == 0):
+      return True
+    else:
+      return False
   else:
     return False
-
-# """
-# cost to nodes from root
-# """
-# def costRoot(root, cur):
-#   pass
 
 """
 cost from nodes to goal
@@ -56,98 +123,55 @@ def costGoal(cur: Matrix):
 
   return cost
 
-# def solve(matr: Tuple[Matrix, int], cost = 0):
-#   # placeholder for each iteration
-#   cost += 1
-#   matrIter = ["up", "right", "down", "left"]
-#   matrQueue = []
-
-#   for i in matrIter:
-#     movedMatr = matr[0].move(i)
-#     if (movedMatr):
-#       temp = (movedMatr, cost + costGoal(movedMatr))
-#       matrQueue.append(temp)
-
-#   # sort by cost
-#   matrQueue.sort(key=itemgetter(1))
-#   smallestCost = matrQueue[0]
-
-#   print(f"{smallestCost[0]}\nCost: {smallestCost[1]}\n")
-#   if (costGoal(smallestCost[0]) == 0):
-#     return
-#   else:
-#     solve(smallestCost, cost)
-
-class PriorityQueue:
-  def __init__(self):
-    self.heap = []
-
-  def push(self, k):
-    heappush(self.heap, k)
-
-  def pop(self):
-    return heappop(self.heap)
-
-  def empty(self):
-    if not self.heap:
-      return True
-    else :
-      return False
-
-class Node:
-
-  def __init__(self, parent, matr, cost, level):
-    self.parent = parent
-    self.matr = matr
-    self.cost = cost
-    self.level = level
-
-  def __lt__(self, nxt):
-    return self.cost < nxt.cost
+"""
+different cost function
+"""
+def costGoalManhattan(cur: Matrix):
+  cost = 0
+  for i in range(1, 16):
+    if (cur.getElmt(i) != i):
+      curIndex = cur.pos(i)
+      xDiff = abs(curIndex // 4 - i // 4)
+      yDiff = abs(curIndex % 4 - curIndex % 4)
+      cost += xDiff + yDiff
+  
+  return cost
 
 
-def createNode(matr, dir, level, parent) -> Node:
-  newMatr = matr.move(dir)
-
-  cost = costGoal(newMatr)
-  print(cost)
-  print(newMatr)
-  newNode = Node(parent, newMatr, cost, level)
-
-  return newNode  
-
-def printPath(root):
-  if (root == None):
-    return
-
-  printPath(root.parent)
-  print(root.matr)
-
+"""
+solve the puzzle using branch and bound
+"""
 def solve(initial):
 
   if (checkBnB(initial)):
     matrIter = ["up", "right", "down", "left"]
+    memory = set()
     pq = PriorityQueue()
 
     cost = costGoal(initial)
-    root = Node(None, initial, cost, 0)
+    root = Node(None, initial, cost, 0, initial.getEmpty())
 
     pq.push(root)
+    count = 0
 
     while not pq.empty():
       minimum = pq.pop()
+      print(f"{count} : {minimum.cost}")
+      count += 1
 
       if minimum.cost == 0:
+        print("--------------------------------")
         printPath(minimum)
-        return minimum
+        return minimum, len(memory)
 
+      memory.add(minimum)
+      
       for i in matrIter:
-        if (minimum.matr.move(i)):
-          print(i)
-          child = createNode(minimum.matr, i, minimum.level + 1, minimum)
-          pq.push(child)
+        movedMatr = minimum.matr.move(i, minimum.emptyPos)
+        if (movedMatr):
+          if movedMatr not in memory:
+            child = createNode(minimum, minimum.matr, i, minimum.emptyPos, minimum.level + 1)
+            pq.push(child)
 
   else:
     print("Matrix unsolveable")
-
-  

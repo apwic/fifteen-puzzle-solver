@@ -41,6 +41,15 @@ class Matrix:
     return randMatrix;
 
   """
+  check valid
+  """
+  def isValid(self):
+    for i in range(1, 16):
+      if (self.pos(i) == -1):
+        return False
+    return True
+    
+  """
   method overriding for printing matrix
   """
   def __str__(self):
@@ -74,6 +83,8 @@ class Matrix:
         return pos
       else:
         pos += 1
+    
+    return -1
 
   """
   get index of empty element
@@ -84,9 +95,8 @@ class Matrix:
   """
   move empty element
   """
-  def move(self, dir):
+  def move(self, dir, emptIndex):
     matr = Matrix(self.matrix)
-    emptIndex = matr.getEmpty()
     # move empty element up
     if (dir == "up"):
       moveIndex = emptIndex - 4

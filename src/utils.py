@@ -1,4 +1,6 @@
 from matrix import *
+from bnb import *
+import time
 
 def readFromFile(fileName):
   path = "./test/" + fileName
@@ -19,7 +21,19 @@ def readFromFile(fileName):
     if countLine != 4:
       raise Exception("Invalid txt file")
     else:
-      return Matrix(matr)
+      return matr
 
   except:
     print(f"{path} not found")
+
+
+def start():
+  fileInput = input("Enter file name: ")
+  matr = Matrix(readFromFile(fileInput))
+  print(matr)
+
+  start_time = time.time()
+  solution, nodes = solve(matr)
+  end_time = time.time()
+  print(f"{solution.level} steps and {nodes} nodes explored")
+  print(end_time - start_time)
