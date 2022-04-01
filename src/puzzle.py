@@ -3,67 +3,74 @@ import numpy as np
 
 EMPTY = 0
 
-class Matrix:
+"""
+using 1 dimensional array because it is faster than 2 dimensional array
+"""
+class Puzzle:
 
   def __init__(self, arg = None):
     if (arg):
-      self.matrix = self.inputMatrix(arg)
+      self.Puzzle = self.inputPuzzle(arg)
     else:
-      self.matrix = self.randomizeMatrix();
+      self.Puzzle = self.randomizePuzzle();
 
   def copy(self):
-    copy = Matrix()
-    copy.matrix = np.copy(self.matrix)
+    copy = Puzzle()
+    copy.Puzzle = np.copy(self.Puzzle)
     return copy
 
   def __eq__(self, other):
-    return self.matrix.tobytes() == other.matrix.tobytes()
+    return self.Puzzle.tobytes() == other.Puzzle.tobytes()
 
   def __hash__(self):
-    return hash(bytes(self.matrix))
+    return hash(bytes(self.Puzzle))
 
   """
-  method overriding for printing matrix
+  method overriding for printing Puzzle
   """
   def __str__(self):
-    s = [["-" if e == 0 else str(e) for e in row] for row in self.matrix]
+    puzzle = np.zeros((4,4), dtype=int)
+    for i in range(4):
+      for j in range(4):
+        puzzle[i][j] = self.Puzzle[i*4 + j]
+
+    s = [["-" if e == 0 else str(e) for e in row] for row in puzzle]
     lens = [max(map(len, col)) for col in zip(*s)]
     fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
     table = [fmt.format(*row) for row in s]
     return('\n'.join(table) + '\n')
 
   """
-  input matrix manually
+  input Puzzle manually
   """
-  def inputMatrix(self, matrix):
+  def inputPuzzle(self, Puzzle):
 
-    inputMatr = np.zeros((4,4), dtype=int)
+    inputPuzz = np.zeros((16,), dtype=int)
 
     for i in range(4):
       for j in range(4):
-        if (matrix[i][j] == 16):
-          inputMatr[i][j] = EMPTY;
+        if (Puzzle[i][j] == 16):
+          inputPuzz[i * 4 + j] = EMPTY;
         else:
-          inputMatr[i][j] = matrix[i][j]
+          inputPuzz[i * 4 + j] = Puzzle[i][j]
 
-    return inputMatr
+    return inputPuzz
 
   """
-  randomize matrix
+  randomize Puzzle
   """
-  def randomizeMatrix(self):
-    matrixElmt = [i for i in range(0,16)]
-    randMatrix = np.zeros((4,4), dtype=int)
+  def randomizePuzzle(self):
+    PuzzleElmt = [i for i in range(0,16)]
+    randPuzzle = np.zeros((16,), dtype=int)
     # randomize the element
-    shuffle(matrixElmt);
+    shuffle(PuzzleElmt)
 
     # assign each element
-    for i in range(4):
-      for j in range(4):
-        popped = matrixElmt.pop()
-        randMatrix[i][j] = popped;
+    for i in range(16):
+      popped = PuzzleElmt.pop()
+      randPuzzle[i] = popped
 
-    return randMatrix;
+    return randPuzzle;
 
   """
   check valid
@@ -80,14 +87,14 @@ class Matrix:
   """
   def getElmt(self, n):
     n -= 1;
-    return self.matrix[n // 4][n % 4]
+    return self.Puzzle[n]
 
   """
   element setter
   """
   def setElmt(self, elmt, n):
     n -= 1;
-    self.matrix[n // 4][n % 4] = elmt
+    self.Puzzle[n] = elmt
 
   """
   get index of element
@@ -112,7 +119,7 @@ class Matrix:
   move empty element
   """
   def move(self, dir, emptIndex):
-    matr = self.copy()
+    puzz = self.copy()
     # move empty element up
     if (dir == "up"):
       moveIndex = emptIndex - 4
@@ -137,12 +144,12 @@ class Matrix:
       print("direction undefined")
       return
 
-    temp = matr.getElmt(moveIndex)
+    temp = puzz.getElmt(moveIndex)
     # switch
-    matr.setElmt(temp, emptIndex)
-    matr.setElmt(EMPTY, moveIndex)
+    puzz.setElmt(temp, emptIndex)
+    puzz.setElmt(EMPTY, moveIndex)
 
-    return matr
+    return puzz
 
 
   def X(self):

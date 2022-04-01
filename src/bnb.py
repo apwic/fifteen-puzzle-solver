@@ -1,4 +1,5 @@
 from matrix import *
+from puzzle import *
 from heapq import heappush, heappop
 
 """
@@ -21,29 +22,30 @@ class PriorityQueue:
       return False
 
 """
-node that can expand when the matrix is moved
+node that can expand when the Puzzle is moved
 """
 class Node:
 
-  def __init__(self, parent, matr, cost, level, emptyPos):
+  def __init__(self, parent, puzzle, cost, level, emptyPos, dir):
     self.parent = parent
-    self.matr = matr
+    self.puzzle = puzzle
     self.cost = cost
     self.level = level
     self.emptyPos = emptyPos
+    self.dir = dir
 
   def __lt__(self, nxt):
     return self.cost + self.level < nxt.cost + nxt.level
 
   # def __hash__(self):
-  #   return hash(bytes(self.matr))
+  #   return hash(bytes(self.puzzle))
 
 """
 create node
 """
-def createNode(parent, matr, movedMatr, dir, emptyPos, level) -> Node:
+def createNode(parent, puzz, movedPuzz, dir, emptyPos, level) -> Node:
 
-  # newMatr = matr.move(dir, emptyPos)
+  # newPuzz = Puzz.move(dir, emptyPos)
 
   if (dir == "up"):
     newEmptyPos = emptyPos - 4
@@ -56,15 +58,15 @@ def createNode(parent, matr, movedMatr, dir, emptyPos, level) -> Node:
   
 
   cost = parent.cost
-  if (matr.getElmt(newEmptyPos) != newEmptyPos):
+  if (puzz.getElmt(newEmptyPos) != newEmptyPos):
     cost -= 1
-  if (matr.getElmt(newEmptyPos) != emptyPos):
+  if (puzz.getElmt(newEmptyPos) != emptyPos):
     cost += 1
   # print(f"Cost : {cost}")
-  # print(newMatr)
+  # print(newPuzz)
 
-  # cost = costGoal(newMatr)
-  newNode = Node(parent, movedMatr, cost, level, newEmptyPos)
+  # cost = costGoal(newPuzz)
+  newNode = Node(parent, movedPuzz, cost, level, newEmptyPos, dir)
 
   return newNode  
 
@@ -76,38 +78,38 @@ def printPath(root):
     return
 
   printPath(root.parent)
-  print(root.matr)
+  print(f"dir: {root.dir}")
+  print(root.puzzle)
 
 """
-find matrix elmt
+find Puzzle elmt
 that is j < i and posisi(j) > posisi(i)
 """
-def kurang(matrix : Matrix, i):
+def kurang(Puzzle, i):
   if (i == 16):
-    iPos = matrix.getEmpty()
+    iPos = Puzzle.getEmpty()
   else:
-    iPos = matrix.pos(i)
+    iPos = Puzzle.pos(i)
   kur = 0
 
   for x in range(1,i):
-    if (matrix.pos(x) > iPos):
+    if (Puzzle.pos(x) > iPos):
       kur += 1;
 
-  print(f"Kurang[{i}] = {kur}")
   return kur
 
 """
-check if matrix is solveable
+check if Puzzle is solveable
 """
-def checkBnB(matrix : Matrix):
-  if (matrix.isValid()):
+def checkBnB(Puzzle):
+  if (Puzzle.isValid()):
     kur = 0
 
     for i in range(1, 17):
-      kur += kurang(matrix, i)
+      kur += kurang(Puzzle, i)
 
-    check = kur + matrix.X()
-    print(f"{check} = {kur} + {matrix.X()}")
+    check = kur + Puzzle.X()
+    print(f"sigma(Kurang): {kur}, X: {Puzzle.X()}")
 
     if (check % 2 == 0):
       return True
@@ -119,7 +121,7 @@ def checkBnB(matrix : Matrix):
 """
 cost from nodes to goal
 """
-def costGoal(cur: Matrix):
+def costGoal(cur):
   cost = 0
   for i in range(1, 16):
     if (cur.getElmt != EMPTY):
@@ -131,7 +133,7 @@ def costGoal(cur: Matrix):
 """
 different cost function
 """
-def costGoalManhattan(cur: Matrix):
+def costGoalManhattan(cur):
   cost = 0
   for i in range(1, 16):
     if (cur.getElmt(i) != i):
@@ -149,12 +151,12 @@ solve the puzzle using branch and bound
 def solve(initial):
 
   if (checkBnB(initial)):
-    matrIter = ["up", "right", "down", "left"]
+    puzzleIter = ["up", "right", "down", "left"]
     memory = set()
     pq = PriorityQueue()
 
     cost = costGoal(initial)
-    root = Node(None, initial, cost, 0, initial.getEmpty())
+    root = Node(None, initial, cost, 0, initial.getEmpty(), "-")
 
     pq.push(root)
     count = 0
@@ -165,21 +167,22 @@ def solve(initial):
       count += 1
 
       if minimum.cost == 0:
-        print("--------------------------------")
+        print()
+        print("-------------------Solution-------------------")
         printPath(minimum)
         # print(memory)
         return minimum, len(memory)
 
-      memory.add(minimum.matr)
+      memory.add(minimum.puzzle)
       
-      for i in matrIter:
-        movedMatr = minimum.matr.move(i, minimum.emptyPos)
-        if (movedMatr):
-          if movedMatr not in memory:
-            child = createNode(minimum, minimum.matr, movedMatr, i, minimum.emptyPos, minimum.level + 1)
+      for i in puzzleIter:
+        movedPuzzle = minimum.puzzle.move(i, minimum.emptyPos)
+        if (movedPuzzle):
+          if movedPuzzle not in memory:
+            child = createNode(minimum, minimum.puzzle, movedPuzzle, i, minimum.emptyPos, minimum.level + 1)
             pq.push(child)
 
   else:
-    print("Matrix unsolveable")
+    print("puzzle unsolveable")
 
   return None, 0

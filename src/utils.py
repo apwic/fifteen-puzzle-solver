@@ -1,4 +1,3 @@
-from matrix import *
 from bnb import *
 import time
 
@@ -29,12 +28,14 @@ def readFromFile(fileName):
 
 
 def start():
-  fileInput = input("Enter file name: ")
-  matr = Matrix(readFromFile(fileInput))
-  print(matr)
+  fileInput = input("enter file name: ")
+  puzzle = Puzzle(readFromFile(fileInput))
+
+  print("\ncurrent puzzle:")
+  print(puzzle)
 
   start_time = time.time()
-  solution, nodes = solve(matr)
+  solution, nodes = solve(puzzle)
   end_time = time.time()
   if (solution):
     print(f"{solution.level} steps and {nodes} nodes explored")
