@@ -25,6 +25,7 @@ def readFromFile(fileName):
 
   except:
     print(f"{path} not found")
+    print("Will use randomize matrix")
 
 
 def start():
@@ -35,5 +36,6 @@ def start():
   start_time = time.time()
   solution, nodes = solve(matr)
   end_time = time.time()
-  print(f"{solution.level} steps and {nodes} nodes explored")
-  print(end_time - start_time)
+  if (solution):
+    print(f"{solution.level} steps and {nodes} nodes explored")
+    print(f"time taken: {end_time - start_time} seconds")

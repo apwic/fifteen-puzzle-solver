@@ -1,4 +1,7 @@
 from random import shuffle
+import numpy as np
+
+EMPTY = 0
 
 class Matrix:
 
@@ -8,16 +11,38 @@ class Matrix:
     else:
       self.matrix = self.randomizeMatrix();
 
+  def copy(self):
+    copy = Matrix()
+    copy.matrix = np.copy(self.matrix)
+    return copy
+
+  def __eq__(self, other):
+    return self.matrix.tobytes() == other.matrix.tobytes()
+
+  def __hash__(self):
+    return hash(bytes(self.matrix))
+
+  """
+  method overriding for printing matrix
+  """
+  def __str__(self):
+    s = [["-" if e == 0 else str(e) for e in row] for row in self.matrix]
+    lens = [max(map(len, col)) for col in zip(*s)]
+    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
+    table = [fmt.format(*row) for row in s]
+    return('\n'.join(table) + '\n')
+
   """
   input matrix manually
   """
   def inputMatrix(self, matrix):
-    inputMatr = [["" for j in range(4)] for i in range(4)]
+
+    inputMatr = np.zeros((4,4), dtype=int)
 
     for i in range(4):
       for j in range(4):
         if (matrix[i][j] == 16):
-          inputMatr[i][j] = "";
+          inputMatr[i][j] = EMPTY;
         else:
           inputMatr[i][j] = matrix[i][j]
 
@@ -27,8 +52,8 @@ class Matrix:
   randomize matrix
   """
   def randomizeMatrix(self):
-    matrixElmt = [i for i in range(1,16)] + [""]
-    randMatrix = [["" for j in range(4)] for i in range(4)]
+    matrixElmt = [i for i in range(0,16)]
+    randMatrix = np.zeros((4,4), dtype=int)
     # randomize the element
     shuffle(matrixElmt);
 
@@ -49,15 +74,6 @@ class Matrix:
         return False
     return True
     
-  """
-  method overriding for printing matrix
-  """
-  def __str__(self):
-    s = [[str(e) for e in row] for row in self.matrix]
-    lens = [max(map(len, col)) for col in zip(*s)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in s]
-    return('\n'.join(table) + '\n')
 
   """
   elemet getter
@@ -90,13 +106,13 @@ class Matrix:
   get index of empty element
   """
   def getEmpty(self):
-    return self.pos("")
+    return self.pos(EMPTY)
 
   """
   move empty element
   """
   def move(self, dir, emptIndex):
-    matr = Matrix(self.matrix)
+    matr = self.copy()
     # move empty element up
     if (dir == "up"):
       moveIndex = emptIndex - 4
@@ -124,7 +140,7 @@ class Matrix:
     temp = matr.getElmt(moveIndex)
     # switch
     matr.setElmt(temp, emptIndex)
-    matr.setElmt("", moveIndex)
+    matr.setElmt(EMPTY, moveIndex)
 
     return matr
 

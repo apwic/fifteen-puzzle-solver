@@ -1,4 +1,3 @@
-from xml.dom.minicompat import NodeList
 from matrix import *
 from heapq import heappush, heappop
 
@@ -36,12 +35,15 @@ class Node:
   def __lt__(self, nxt):
     return self.cost + self.level < nxt.cost + nxt.level
 
+  # def __hash__(self):
+  #   return hash(bytes(self.matr))
+
 """
 create node
 """
-def createNode(parent, matr, dir, emptyPos, level) -> Node:
+def createNode(parent, matr, movedMatr, dir, emptyPos, level) -> Node:
 
-  newMatr = matr.move(dir, emptyPos)
+  # newMatr = matr.move(dir, emptyPos)
 
   if (dir == "up"):
     newEmptyPos = emptyPos - 4
@@ -52,15 +54,17 @@ def createNode(parent, matr, dir, emptyPos, level) -> Node:
   else:
     newEmptyPos = emptyPos - 1
   
-  # if (newMatr.getElmt(emptyPos) == emptyPos):
-  #   cost = parent.cost - 1
-  # else:
-  #   cost = parent.cost
+
+  cost = parent.cost
+  if (matr.getElmt(newEmptyPos) != newEmptyPos):
+    cost -= 1
+  if (matr.getElmt(newEmptyPos) != emptyPos):
+    cost += 1
   # print(f"Cost : {cost}")
   # print(newMatr)
 
-  cost = costGoal(newMatr)
-  newNode = Node(parent, newMatr, cost, level, newEmptyPos)
+  # cost = costGoal(newMatr)
+  newNode = Node(parent, movedMatr, cost, level, newEmptyPos)
 
   return newNode  
 
@@ -118,8 +122,9 @@ cost from nodes to goal
 def costGoal(cur: Matrix):
   cost = 0
   for i in range(1, 16):
-    if (cur.getElmt(i) != i):
-      cost += 1
+    if (cur.getElmt != EMPTY):
+      if (cur.getElmt(i) != i):
+        cost += 1
 
   return cost
 
@@ -156,22 +161,25 @@ def solve(initial):
 
     while not pq.empty():
       minimum = pq.pop()
-      print(f"{count} : {minimum.cost}")
+      # print(f"{count} : {minimum.cost}")
       count += 1
 
       if minimum.cost == 0:
         print("--------------------------------")
         printPath(minimum)
+        # print(memory)
         return minimum, len(memory)
 
-      memory.add(minimum)
+      memory.add(minimum.matr)
       
       for i in matrIter:
         movedMatr = minimum.matr.move(i, minimum.emptyPos)
         if (movedMatr):
           if movedMatr not in memory:
-            child = createNode(minimum, minimum.matr, i, minimum.emptyPos, minimum.level + 1)
+            child = createNode(minimum, minimum.matr, movedMatr, i, minimum.emptyPos, minimum.level + 1)
             pq.push(child)
 
   else:
     print("Matrix unsolveable")
+
+  return None, 0
