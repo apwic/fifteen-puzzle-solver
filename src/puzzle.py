@@ -29,16 +29,31 @@ class Puzzle:
   method overriding for printing Puzzle
   """
   def __str__(self):
+    
     puzzle = np.zeros((4,4), dtype=int)
     for i in range(4):
       for j in range(4):
         puzzle[i][j] = self.Puzzle[i*4 + j]
 
-    s = [["-" if e == 0 else str(e) for e in row] for row in puzzle]
-    lens = [max(map(len, col)) for col in zip(*s)]
-    fmt = '\t'.join('{{:{}}}'.format(x) for x in lens)
-    table = [fmt.format(*row) for row in s]
-    return('\n'.join(table) + '\n')
+
+    output = []
+    output.append("╔═══╦═══╦═══╦═══╗")
+    for i in range(4):
+      elmt = ""
+      for j in range(4):
+        if (puzzle[i][j] == EMPTY):
+          elmt += "║ " + "-" 
+        else:
+          elmt += "║ " + str(puzzle[i][j])
+        if (puzzle[i][j] < 10):
+          elmt += " "
+      elmt += "║"
+      output.append(elmt)
+      if (i != 3):
+        output.append("╠═══╬═══╬═══╬═══╣")
+    output.append("╚═══╩═══╩═══╩═══╝")
+
+    return('\n'.join(output) + '\n')
 
   """
   input Puzzle manually
@@ -151,14 +166,8 @@ class Puzzle:
 
     return puzz
 
-
   def X(self):
     emptIndex = self.getEmpty() - 1
     i = emptIndex // 4
     j = emptIndex % 4
     return (i + j) % 2
-
-
-
-
-

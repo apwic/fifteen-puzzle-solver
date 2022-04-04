@@ -1,4 +1,3 @@
-from matrix import *
 from puzzle import *
 from heapq import heappush, heappop
 
@@ -35,17 +34,16 @@ class Node:
     self.dir = dir
 
   def __lt__(self, nxt):
-    return self.cost + self.level < nxt.cost + nxt.level
+    if (self.cost + self.level) == (nxt.cost + nxt.level):
+      return self.cost < nxt.cost
+    else:
+      return self.cost + self.level < nxt.cost + nxt.level
 
-  # def __hash__(self):
-  #   return hash(bytes(self.puzzle))
 
 """
 create node
 """
 def createNode(parent, puzz, movedPuzz, dir, emptyPos, level) -> Node:
-
-  # newPuzz = Puzz.move(dir, emptyPos)
 
   if (dir == "up"):
     newEmptyPos = emptyPos - 4
@@ -56,16 +54,13 @@ def createNode(parent, puzz, movedPuzz, dir, emptyPos, level) -> Node:
   else:
     newEmptyPos = emptyPos - 1
   
-
+  # O(1) cost finding
   cost = parent.cost
   if (puzz.getElmt(newEmptyPos) != newEmptyPos):
     cost -= 1
   if (puzz.getElmt(newEmptyPos) != emptyPos):
     cost += 1
-  # print(f"Cost : {cost}")
-  # print(newPuzz)
 
-  # cost = costGoal(newPuzz)
   newNode = Node(parent, movedPuzz, cost, level, newEmptyPos, dir)
 
   return newNode  
@@ -96,6 +91,7 @@ def kurang(Puzzle, i):
     if (Puzzle.pos(x) > iPos):
       kur += 1;
 
+  print(f"kurang[{i}]\t: {kur}")
   return kur
 
 """
@@ -109,7 +105,7 @@ def checkBnB(Puzzle):
       kur += kurang(Puzzle, i)
 
     check = kur + Puzzle.X()
-    print(f"sigma(Kurang): {kur}, X: {Puzzle.X()}")
+    print(f"\nsigma(kurang): {kur}, X: {Puzzle.X()}")
 
     if (check % 2 == 0):
       return True
@@ -151,7 +147,10 @@ solve the puzzle using branch and bound
 def solve(initial):
 
   if (checkBnB(initial)):
-    puzzleIter = ["up", "right", "down", "left"]
+    # puzzleIter = ["up", "right", "down", "left"]
+    puzzleIter = ["down", "up", "right", "left"]
+    # puzzleIter = ["down", "right", "left", "up"]
+    # puzzleIter = ["down", "right", "up", "left"]
     memory = set()
     pq = PriorityQueue()
 
@@ -163,14 +162,9 @@ def solve(initial):
 
     while not pq.empty():
       minimum = pq.pop()
-      # print(f"{count} : {minimum.cost}")
       count += 1
 
       if minimum.cost == 0:
-        print()
-        print("-------------------Solution-------------------")
-        printPath(minimum)
-        # print(memory)
         return minimum, len(memory)
 
       memory.add(minimum.puzzle)

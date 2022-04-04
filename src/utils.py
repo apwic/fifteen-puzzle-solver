@@ -38,5 +38,7 @@ def start():
   solution, nodes = solve(puzzle)
   end_time = time.time()
   if (solution):
+    print("\n-------------------Solution-------------------")
+    printPath(solution)
     print(f"{solution.level} steps and {nodes} nodes explored")
-    print(f"time taken: {end_time - start_time} seconds")
+    print("time taken: %.4f seconds" %(end_time - start_time))
