@@ -7,6 +7,7 @@
 * [Features](#features)
 * [Pembagian Tugas](#pembagian-tugas)
 * [Setup](#setup)
+* [Input](#input)
 * [Usage](#usage)
 * [Project Status](#project-status)
 * [Room for Improvement](#room-for-improvement)
@@ -45,6 +46,17 @@ pip3 install -r requirements.txt
 - _Command_ tersebut akan melakukan install terhadap _library_ yang dibutuhkan untuk menjalankan program
 - Jika ingin menggunakan file csv tambahan silahkan tambahkan file csv tersebut ke folder test
 
+## Input
+- Telah tersedia test case pada folder `test`
+- Pilih salah satu test case dari file yang tersedia atau tambahkan test case dengan format
+```
+1 2 3 4
+5 6 7 8
+10 11 12 16
+9 13 14 15
+```
+- Petak kosong dapat diisi dengan angka 16 ataupun 0
+
 ## Usage
 - Pastikan sudah dilakukan clone atau _download_ terhadap repository ini
 - Buka folder repository ini pada terminal
@@ -53,7 +65,7 @@ pip3 install -r requirements.txt
 src\Scripts\activate
 python main.py
 ```
-- Program akan berjalan dan silahkan masukkan input sesuai yang diminta oleh program
+- Program akan berjalan dan silahkan masukkan input file ``.txt`` yang tersedia pada folder test case, jika file yang di-_input_ tidak ada maka program akan secara otomatis melakukan random terhadap puzzle
 - Setelah selesai menggunakan program, matikan virtualenv dengan _command_ pada terminal:
 ```
 deactivate
